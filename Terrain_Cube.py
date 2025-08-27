@@ -1,15 +1,12 @@
 import numpy as np
 
 class TerrainCube:
+
     def __init__(self, x, y, z, 
                  terrain_type="grass", 
                  height=0, 
                  moisture=0.5, 
                  temperature=20.0):
-        """
-        Minimal version of TerrainCube for NumPy-based grid.
-        Extend attributes later as needed.
-        """
         self.x = x
         self.y = y
         self.z = z
@@ -20,7 +17,6 @@ class TerrainCube:
 
     def update_height(self, new_height):
         self.height = new_height
-        # TODO: auto update terrain_type based on height (your turn!)
 
     def update_type(self, new_type):
         self.terrain_type = new_type
@@ -29,7 +25,7 @@ class TerrainCube:
         return f"Cube({self.x},{self.y},{self.z})[{self.terrain_type}, h={self.height}]"
 
 
-def create_terrain_grid(shape=(10, 10, 10), default_height=0):
+def create_terrain_grid(shape=(10, 10, 5), default_height=0):
     """
     Create a 3D NumPy array of TerrainCube objects.
     shape = (z, y, x)
@@ -45,7 +41,7 @@ def create_terrain_grid(shape=(10, 10, 10), default_height=0):
     return grid
 
 
-def update_tile(grid, x, y, z, height=None, terrain_type=None):
+def update_cube(grid, x, y, z, height=None, terrain_type=None):
     """Update the TerrainCube at (x,y,z)."""
     cube = grid[z, y, x]
     if height is not None:
@@ -66,12 +62,22 @@ def print_terrain_slice(grid, z_level):
 
 def get_neighbors(grid, x, y, z):
     """
-    Return valid 6-directional neighbors of a cube.
-    TODO: Implement this yourself!
-    Hint: check bounds before accessing.
+    Return valid all neighbors of the cube.
     """
     neighbors = []
-    # your code here
+    max_z, max_y, max_x = grid.shape
+
+    for dz in [-1, 0, 1]:
+        for dy in [-1, 0, 1]:
+            for dx in [-1, 0, 1]:
+                if dx == 0 and dy == 0 and dz == 0:
+                    continue
+
+                nz, ny, nx = z + dz, y + dy, x + dx
+
+                if 0 <= nz < max_z and 0 <= ny < max_y and 0 <= nx < max_x:
+                    neighbors.append(grid[nz, ny, nx])
+
     return neighbors
 
 
@@ -79,8 +85,10 @@ if __name__ == "__main__":
     grid = create_terrain_grid((3, 3, 2), default_height=0)
     print_terrain_slice(grid, 0)
 
-    # Try updating a tile
-    update_tile(grid, 1, 1, 0, height=5, terrain_type="mountain")
+    # Try updating a cube
+    update_cube(grid, 1, 1, 0, height=5, terrain_type="mountain")
     print_terrain_slice(grid, 0)
 
-    # TODO: Test your get_neighbors implementation here
+    # Test neighbours of a cube\
+    neighbours = get_neighbors(grid, 1, 1, 0)
+    print("Neighbours of (1, 1, 0): ", neighbours)
